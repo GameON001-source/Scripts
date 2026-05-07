@@ -1,10 +1,4 @@
 @echo off
-title GameOn Digital - Central de Jogos
-color 0A
-
-:: ============================================
-:: CONFIGURAÇÃO DA SENHA
-:: ============================================
 set "senhaCorreta=2727"
 
 :autenticacao
@@ -19,10 +13,9 @@ if "%tentativa%"=="%senhaCorreta%" (
     goto :menu
 ) else (
     echo.
-    echo [ERRO] Chave incorreta ou expirada!
-    echo Adquira sua licenca em: gameondigital.carrd.co
+    echo [ERRO] Chave incorreta!
     pause
-    goto :autenticacao
+    exit
 )
 
 :menu
@@ -50,63 +43,31 @@ cls
 echo [!] Preparando ambiente...
 if not exist "C:\GameON" mkdir "C:\GameON"
 cd /d "C:\GameON"
-
 echo [!] Baixando arquivos... Aguarde.
-echo.
-
-:: DOWNLOAD VIA BITS (MOSTRA BARRA DE PROGRESSO NO TOPO)
 powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
-
-if not exist "C:\GameON\JOGOS_GameON.zip" (
-    echo.
-    echo [ERRO] Nao foi possivel completar o download.
-    pause
-    goto :menu
-)
-
-cls
-echo ============================================
-echo           GAMEON DIGITAL - INSTALANDO
-echo ============================================
-echo.
-echo [!] Extraindo e instalando arquivos... 
-echo [!] Este processo pode levar alguns minutos.
-echo.
-
-:: EXTRAÇÃO SILENCIOSA
-tar -xf "C:\GameON\JOGOS_GameON.zip" -C "C:\GameON"
-
-:: LIMPEZA DO ARQUIVO ZIP
+echo [!] Instalando...
+powershell -Command "Expand-Archive -Path 'C:\GameON\JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
 del /f /q "C:\GameON\JOGOS_GameON.zip"
-
 echo.
-echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
-echo [+] Local: C:\GameON
-echo.
+echo [+] INSTALACAO CONCLUIDA!
 pause
 goto :menu
 
 :atualizar
 cls
-echo [!] Procurando atualizacoes... Aguarde.
 cd /d "C:\GameON"
+echo [!] Atualizando...
 powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
-tar -xf "C:\GameON\JOGOS_GameON.zip" -C "C:\GameON"
+powershell -Command "Expand-Archive -Path 'C:\GameON\JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
 del /f /q "C:\GameON\JOGOS_GameON.zip"
-echo.
-echo [+] Atualizado com sucesso!
+echo [+] Atualizado!
 pause
 goto :menu
 
 :desinstalar
 cls
-echo [!] ATENCAO: Todos os dados da pasta C:\GameON serao removidos.
-set /p confirma="Deseja continuar? (S/N): "
-if /i "%confirma%"=="S" (
-    cd /d C:\
-    rd /s /q "C:\GameON"
-    echo.
-    echo [-] Remocao concluida.
-)
+echo [!] Desinstalando...
+rd /s /q "C:\GameON" 2>nul
+echo [-] Pasta removida.
 pause
 goto :menu
