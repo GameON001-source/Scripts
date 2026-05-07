@@ -1,4 +1,10 @@
 @echo off
+title GameOn Digital - Central de Jogos
+color 0A
+
+:: ============================================
+:: CONFIGURAÇÃO DA SENHA
+:: ============================================
 set "senhaCorreta=2727"
 
 :autenticacao
