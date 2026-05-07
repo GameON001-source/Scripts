@@ -25,25 +25,24 @@ goto :menu
 :instalar
 cls
 echo [!] Iniciando Instalacao...
-echo Baixando arquivos do servidor MediaFire...
-:: Substitua pelo seu link direto se necessario
-curl -L "https://www.mediafire.com/file/baoqw8uen6qnh83/JOGOS_STEAM_GameON.zip/file" -o JOGOS_GameON.zip
+echo Baixando arquivos (1.5GB)... Isso pode demorar.
+:: Usei o link direto corrigido abaixo
+curl -L "https://www.mediafire.com/download/baoqw8uen6qnh83" -o JOGOS_GameON.zip
+echo.
 echo [!] Extraindo jogos...
 tar -xf JOGOS_GameON.zip
 del JOGOS_GameON.zip
 echo.
-echo [+] Instalacao concluida com sucesso!
+echo [+] Instalacao concluida!
 pause
 goto :menu
 
 :atualizar
 cls
-echo [!] Verificando atualizacoes no GitHub...
-:: Aqui ele basicamente roda o processo de baixar novamente para garantir que os arquivos sao os mais novos
-curl -L "https://www.mediafire.com/file/baoqw8uen6qnh83/JOGOS_STEAM_GameON.zip/file" -o JOGOS_GameON.zip
+echo [!] Verificando atualizacoes...
+curl -L "https://www.mediafire.com/download/baoqw8uen6qnh83" -o JOGOS_GameON.zip
 tar -xf JOGOS_GameON.zip -m
 del JOGOS_GameON.zip
-echo.
 echo [+] Arquivos atualizados!
 pause
 goto :menu
@@ -53,12 +52,9 @@ cls
 echo [!] ATENCAO: Isso vai apagar a pasta de jogos.
 set /p confirma="Tem certeza? (S/N): "
 if /i "%confirma%"=="S" (
-    :: Altere "JOGOS_STEAM" para o nome exato da pasta que o seu ZIP cria
-    rd /s /q "JOGOS_STEAM" 2>nul
+    rd /s /q "JOGOS_STEAM_GameON" 2>nul
     echo.
     echo [-] Arquivos removidos.
-) else (
-    echo Desinstalacao cancelada.
 )
 pause
 goto :menu
