@@ -3,7 +3,7 @@ title GameOn Digital - Central de Jogos
 color 0A
 
 :: ============================================
-:: CONFIGURAÇÃO DA SENHA (ATUALIZADA)
+:: CONFIGURAÇÃO DA SENHA
 :: ============================================
 set "senhaCorreta=2727"
 
@@ -31,7 +31,7 @@ echo ============================================
 echo           GAMEON DIGITAL - MENU
 echo ============================================
 echo.
-echo  [1] INSTALAR BIBLIOTECA (ALTA VELOCIDADE)
+echo  [1] INSTALAR BIBLIOTECA
 echo  [2] ATUALIZAR ARQUIVOS
 echo  [3] DESINSTALAR TUDO
 echo  [4] SAIR
@@ -47,53 +47,66 @@ goto :menu
 
 :instalar
 cls
-echo [!] Criando ambiente GameON...
+echo [!] Preparando ambiente...
 if not exist "C:\GameON" mkdir "C:\GameON"
 cd /d "C:\GameON"
 
-echo [!] Iniciando Download de 1.5GB (Google Drive)...
-echo Por favor, aguarde a conclusao.
+echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: DOWNLOAD DE ALTA VELOCIDADE (BITS)
-powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'JOGOS_GameON.zip'"
+:: DOWNLOAD VIA BITS (MOSTRA BARRA DE PROGRESSO NO TOPO)
+powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
 
-if not exist "JOGOS_GameON.zip" (
+if not exist "C:\GameON\JOGOS_GameON.zip" (
     echo.
-    echo [ERRO] Falha ao conectar ao servidor de arquivos.
+    echo [ERRO] Nao foi possivel completar o download.
     pause
     goto :menu
 )
 
+cls
+echo ============================================
+echo           GAMEON DIGITAL - INSTALANDO
+echo ============================================
 echo.
-echo [!] Extraindo jogos automaticamente...
-tar -xf JOGOS_GameON.zip
-del JOGOS_GameON.zip
+echo [!] Extraindo e instalando arquivos... 
+echo [!] Este processo pode levar alguns minutos.
 echo.
-echo [+] SUCESSO! Jogos prontos em C:\GameON
+
+:: EXTRAÇÃO SILENCIOSA
+tar -xf "C:\GameON\JOGOS_GameON.zip" -C "C:\GameON"
+
+:: LIMPEZA DO ARQUIVO ZIP
+del /f /q "C:\GameON\JOGOS_GameON.zip"
+
+echo.
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
+echo [+] Local: C:\GameON
+echo.
 pause
 goto :menu
 
 :atualizar
 cls
+echo [!] Procurando atualizacoes... Aguarde.
 cd /d "C:\GameON"
-echo [!] Buscando novas versoes...
-powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'JOGOS_GameON.zip'"
-tar -xf JOGOS_GameON.zip
-del JOGOS_GameON.zip
+powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
+tar -xf "C:\GameON\JOGOS_GameON.zip" -C "C:\GameON"
+del /f /q "C:\GameON\JOGOS_GameON.zip"
 echo.
-echo [+] Atualizacao concluida!
+echo [+] Atualizado com sucesso!
 pause
 goto :menu
 
 :desinstalar
 cls
-echo [!] ATENCAO: Isso apagara todos os jogos da pasta C:\GameON.
-set /p confirma="Confirmar remocao? (S/N): "
+echo [!] ATENCAO: Todos os dados da pasta C:\GameON serao removidos.
+set /p confirma="Deseja continuar? (S/N): "
 if /i "%confirma%"=="S" (
     cd /d C:\
     rd /s /q "C:\GameON"
-    echo [-] Limpeza concluida.
+    echo.
+    echo [-] Remocao concluida.
 )
 pause
 goto :menu
