@@ -1,45 +1,96 @@
-# GameOn Digital - Sistema de Download Inteligente
-$senhaCorreta = "2727"
-$fileId = "17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-"
-$destino = "C:\GameON\JOGOS.zip"
+@echo off
+title GameOn Digital - Central de Jogos
+color 0A
 
-Clear-Host
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-$tentativa = Read-Host " Digite sua Chave de Acesso"
+:: CONFIGURAÇÃO DA SENHA
+set "senhaCorreta=2727"
 
-if ($tentativa -ne $senhaCorreta) {
-    Write-Host "`n[ERRO] Chave incorreta!" -ForegroundColor Red
-    Start-Sleep -Seconds 2; exit
-}
+:autenticacao
+cls
+echo ============================================
+echo           GAMEON DIGITAL - ACESSO
+echo ============================================
+echo.
+set /p "tentativa=Digite sua Chave: "
 
-# Criar pasta de destino
-if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory | Out-Null }
-Set-Location "C:\GameON"
+if "%tentativa%"=="%senhaCorreta%" (
+    goto :menu
+) else (
+    echo.
+    echo [ERRO] Chave incorreta!
+    pause
+    exit
+)
 
-Write-Host "`n[!] Iniciando conexao segura com o servidor..." -ForegroundColor Yellow
+:menu
+cls
+echo ============================================
+echo           GAMEON DIGITAL - MENU
+echo ============================================
+echo.
+echo  [1] INSTALAR BIBLIOTECA
+echo  [2] ATUALIZAR ARQUIVOS
+echo  [3] DESINSTALAR TUDO
+echo  [4] SAIR
+echo.
+echo ============================================
+set /p opcao="Escolha uma opcao: "
 
-# --- LOGICA PARA PULAR AVISO DO GOOGLE DRIVE ---
-$url = "https://docs.google.com/uc?export=download&id=$fileId"
-$cookieFile = [System.IO.Path]::GetTempFileName()
-try {
-    $resp = Invoke-WebRequest -Uri $url -SessionVariable 'sess' -UseBasicParsing
-    $token = ($resp.Links | Where-Object { $_.href -like "*confirm=*" }).href.Split('confirm=')[1].Split('&')[0]
-    $downloadUrl = "https://docs.google.com/uc?export=download&confirm=$token&id=$fileId"
-} catch {
-    # Se não precisar de token (arquivos menores), usa a URL direta
-    $downloadUrl = $url
-}
+if "%opcao%"=="1" goto :instalar
+if "%opcao%"=="2" goto :atualizar
+if "%opcao%"=="3" goto :desinstalar
+if "%opcao%"=="4" exit
+goto :menu
 
-Write-Host "[!] Baixando jogos (1.5GB)... Por favor, aguarde." -ForegroundColor Cyan
-# Download com barra de progresso visivel
-Start-BitsTransfer -Source $downloadUrl -Destination $destino -Priority Foreground
+:instalar
+cls
+echo [!] Preparando ambiente...
+if not exist "C:\GameON" mkdir "C:\GameON"
+cd /d "C:\GameON"
 
-Write-Host "`n[!] Extraindo arquivos... Nao feche a janela." -ForegroundColor Yellow
-Expand-Archive -Path $destino -DestinationPath "C:\GameON" -Force
-Remove-Item $destino -Force
+echo [!] Baixando arquivos... Aguarde.
+echo.
 
-Write-Host "`n[+] INSTALACAO FINALIZADA COM SUCESSO!" -ForegroundColor Green
-Write-Host "[+] Seus jogos estao em C:\GameON"
+:: O segredo: curl com -L e &confirm=t para ignorar avisos do Google
+curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+
+if not exist "JOGOS_GameON.zip" (
+    echo.
+    echo [ERRO] Falha no download. Verifique sua conexao.
+    pause
+    goto :menu
+)
+
+echo.
+echo [!] Instalando e extraindo... Aguarde.
+:: Usando tar que é nativo e não dá erro de PowerShell
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+
+echo.
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
 pause
+goto :menu
+
+:atualizar
+cls
+cd /d "C:\GameON"
+echo [!] Atualizando...
+curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+echo [+] Atualizado!
+pause
+goto :menu
+
+:desinstalar
+cls
+echo [!] Desinstalar tudo? (S/N)
+set /p confirma="> "
+if /i "%confirma%"=="S" (
+    cd /d C:\
+    rd /s /q "C:\GameON"
+    echo [-] Pasta removida.
+)
+pause
+goto :menu
