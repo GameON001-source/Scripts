@@ -1,98 +1,107 @@
-@echo off
-title GameOn Digital - Central de Jogos
-color 0A
+# =====================================================================
+# GAMEON DIGITAL - GESTÃO DE BIBLIOTECA V1.0
+# =====================================================================
 
-:: SENHA DE ACESSO
-set "senhaCorreta=2727"
+$OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$Host.UI.RawUI.WindowTitle = "GameOn Digital - Instalador Oficial"
+Clear-Host
 
-:autenticacao
-cls
-echo ============================================
-echo           GAMEON DIGITAL - ACESSO
-echo ============================================
-echo.
-set /p "tentativa=Digite sua Chave de Acesso: "
+# Habilita cores no console do Windows
+if ($host.Name -eq 'ConsoleHost') {
+    $mode = Get-ItemProperty -Path "HKCU:\Console" -Name "VirtualTerminalLevel" -ErrorAction SilentlyContinue
+    if (-not $mode) {
+        New-ItemProperty -Path "HKCU:\Console" -Name "VirtualTerminalLevel" -PropertyType DWord -Value 1 -Force | Out-Null
+    }
+}
 
-if "%tentativa%"=="%senhaCorreta%" (
-    goto :menu
-) else (
-    echo.
-    echo [ERRO] Chave incorreta!
-    pause
-    exit
-)
+# ===== ACESSO =====
+$senhaCorreta = "2727"
+Write-Host "----------------------------------------" -ForegroundColor Cyan
+$inputSenha = Read-Host " DIGITE A CHAVE DE ACESSO (GAMEON) "
+if ($inputSenha -ne $senhaCorreta) { 
+    Write-Host "`n[ERRO] Acesso negado. Chave incorreta." -ForegroundColor Red
+    Start-Sleep -Seconds 3
+    exit 
+}
 
-:menu
-cls
-echo ============================================
-echo           GAMEON DIGITAL - MENU
-echo ============================================
-echo.
-echo  [1] INSTALAR BIBLIOTECA
-echo  [2] ATUALIZAR ARQUIVOS
-echo  [3] DESINSTALAR TUDO
-echo  [4] SAIR
-echo.
-echo ============================================
-set /p opcao="Escolha uma opcao: "
+function Show-Header {
+    Clear-Host
+    Write-Host "   ____                     ___        " -ForegroundColor Cyan
+    Write-Host "  / ___| __ _ _ __ ___   ___/ _ \ _ __  " -ForegroundColor Cyan
+    Write-Host " | |  _ / _` | '_ ` _ \ / _ \ | | | '_ \ " -ForegroundColor Cyan
+    Write-Host " | |_| | (_| | | | | | |  __/ |_| | | | |" -ForegroundColor Cyan
+    Write-Host "  \____|\__,_|_| |_| |_|\___|\___/|_| |_|" -ForegroundColor Cyan
+    Write-Host " ----------------------------------------------------" -ForegroundColor White
+    Write-Host "         SISTEMA DE INSTALAÇÃO DE ALTA PERFORMANCE" -ForegroundColor Yellow
+    Write-Host " ----------------------------------------------------`n" -ForegroundColor White
+}
 
-if "%opcao%"=="1" goto :instalar
-if "%opcao%"=="2" goto :atualizar
-if "%opcao%"=="3" goto :desinstalar
-if "%opcao%"=="4" exit
-goto :menu
+function Executar-Instalacao {
+    Show-Header
+    
+    $destino = "C:\GameON"
+    $zipFile = "$env:TEMP\JOGOS_GameON.zip"
 
-:instalar
-cls
-echo [!] Preparando ambiente em C:\GameON...
-if not exist "C:\GameON" mkdir "C:\GameON"
-cd /d "C:\GameON"
+    # 1. PREPARAÇÃO
+    Write-Host "[!] Preparando ambiente em $destino..." -ForegroundColor Yellow
+    if (-not (Test-Path $destino)) { New-Item -ItemType Directory -Path $destino | Out-Null }
 
-echo [!] Baixando arquivos... Aguarde.
-echo.
+    # 2. DOWNLOAD
+    Write-Host "[!] Baixando pacotes do servidor central..." -ForegroundColor Cyan
+    $urlDrive = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
+    
+    try {
+        # Start-BitsTransfer mostra a barra de progresso nativa do Windows
+        Start-BitsTransfer -Source $urlDrive -Destination $zipFile -ErrorAction Stop
+    } catch {
+        Write-Host "`n[ERRO] Falha no download. Verifique a internet ou o link." -ForegroundColor Red
+        Pause; return
+    }
 
-:: USANDO CURL.EXE PARA EVITAR CONFLITOS
-curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+    # 3. EXTRAÇÃO
+    Write-Host "`n[!] Extraindo arquivos para a biblioteca..." -ForegroundColor Cyan
+    try {
+        Expand-Archive -Path $zipFile -DestinationPath $destino -Force -ErrorAction Stop
+        
+        # 4. LIMPEZA
+        Remove-Item $zipFile -Force -ErrorAction SilentlyContinue
+        Write-Host "`n[+] GAMEON DIGITAL INSTALADO COM SUCESSO!" -ForegroundColor Green
+        Write-Host "[+] Local: $destino" -ForegroundColor Green
+    } catch {
+        Write-Host "`n[ERRO] Falha na extração dos arquivos." -ForegroundColor Red
+    }
+    Pause
+}
 
-if not exist "JOGOS_GameON.zip" (
-    echo.
-    echo [ERRO] Falha no download. Verifique sua conexao.
-    pause
-    goto :menu
-)
+function Desinstalar-Tudo {
+    Show-Header
+    Write-Host "[!] ATENÇÃO: Isso removerá todos os jogos da pasta C:\GameON" -ForegroundColor Red
+    $confirma = Read-Host "Deseja continuar? (S/N)"
+    if ($confirma -eq 'S' -or $confirma -eq 's') {
+        if (Test-Path "C:\GameON") {
+            Remove-Item "C:\GameON" -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "[-] Sistema removido com sucesso." -ForegroundColor Green
+        } else {
+            Write-Host "[-] A pasta não foi encontrada." -ForegroundColor Yellow
+        }
+    }
+    Pause
+}
 
-echo.
-echo [!] Instalando e extraindo arquivos...
-tar.exe -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
+# ===== MENU PRINCIPAL =====
+while ($true) {
+    Show-Header
+    Write-Host " 1. Instalar Biblioteca de Jogos"
+    Write-Host " 2. Atualizar Arquivos"
+    Write-Host " 3. Desinstalar Sistema"
+    Write-Host " 4. Sair do Instalador"
+    $opt = Read-Host "`nEscolha uma opção"
 
-echo.
-echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
-echo [+] Verifique a pasta C:\GameON
-pause
-goto :menu
-
-:atualizar
-cls
-cd /d "C:\GameON"
-echo [!] Atualizando arquivos...
-curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
-tar.exe -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
-echo.
-echo [+] Atualizado com sucesso!
-pause
-goto :menu
-
-:desinstalar
-cls
-echo [!] Desinstalar tudo? (Isso apagara a pasta C:\GameON)
-set /p confirma="(S/N): "
-if /i "%confirma%"=="S" (
-    cd /d C:\
-    rd /s /q "C:\GameON"
-    echo.
-    echo [-] Removido com sucesso.
-)
-pause
-goto :menu
+    switch ($opt) {
+        "1" { Executar-Instalacao }
+        "2" { Executar-Instalacao } 
+        "3" { Desinstalar-Tudo }
+        "4" { exit }
+    }
+}
