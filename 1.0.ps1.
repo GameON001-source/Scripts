@@ -1,4 +1,4 @@
-# Central GameOn Digital
+# GameOn Digital - Script de Instalação
 $senhaCorreta = "2727"
 
 Clear-Host
@@ -6,31 +6,60 @@ Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
+
 $tentativa = Read-Host "Digite sua Chave de Acesso"
 
 if ($tentativa -ne $senhaCorreta) {
-    Write-Host "[ERRO] Chave incorreta!" -ForegroundColor Red
-    pause
+    Write-Host ""
+    Write-Host "[ERRO] Chave incorreta! Acesso negado." -ForegroundColor Red
+    Start-Sleep -Seconds 3
     exit
 }
 
-Clear-Host
-Write-Host " [1] INSTALAR BIBLIOTECA"
-Write-Host " [2] SAIR"
+function Show-Menu {
+    Clear-Host
+    Write-Host "============================================" -ForegroundColor Cyan
+    Write-Host "          GAMEON DIGITAL - MENU" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host " [1] INSTALAR BIBLIOTECA"
+    Write-Host " [2] ATUALIZAR ARQUIVOS"
+    Write-Host " [3] DESINSTALAR TUDO"
+    Write-Host " [4] SAIR"
+    Write-Host ""
+}
+
+Show-Menu
 $opcao = Read-Host "Escolha uma opcao"
 
-if ($opcao -eq "1") {
-    if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory }
-    Set-Location "C:\GameON"
-    Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Cyan
-    
-    # Link do MediaFire que você enviou
-    $url = "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip"
-    
-    Invoke-WebRequest -Uri $url -OutFile "C:\GameON\JOGOS.zip"
-    Write-Host "[!] Extraindo..." -ForegroundColor Yellow
-    Expand-Archive -Path "C:\GameON\JOGOS.zip" -DestinationPath "C:\GameON" -Force
-    Remove-Item "C:\GameON\JOGOS.zip"
-    Write-Host "[+] CONCLUIDO!" -ForegroundColor Green
-    pause
+switch ($opcao) {
+    "1" {
+        if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory }
+        Set-Location "C:\GameON"
+        Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Yellow
+        
+        # Download direto do Google Drive
+        curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+        
+        Write-Host "[!] Extraindo arquivos..." -ForegroundColor Cyan
+        tar.exe -xf "JOGOS_GameON.zip"
+        Remove-Item "JOGOS_GameON.zip" -Force
+        Write-Host "[+] INSTALACAO CONCLUIDA!" -ForegroundColor Green
+        pause
+    }
+    "2" {
+        Set-Location "C:\GameON"
+        Write-Host "[!] Atualizando..." -ForegroundColor Yellow
+        curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+        tar.exe -xf "JOGOS_GameON.zip"
+        Remove-Item "JOGOS_GameON.zip" -Force
+        Write-Host "[+] Atualizado!" -ForegroundColor Green
+        pause
+    }
+    "3" {
+        Remove-Item "C:\GameON" -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "[-] Pasta GameON removida." -ForegroundColor Yellow
+        pause
+    }
+    "4" { exit }
 }
