@@ -2,6 +2,9 @@
 title GameOn Digital - Central de Jogos
 color 0A
 
+:: ============================================
+:: CONFIGURAÇÃO DA SENHA
+:: ============================================
 set "senhaCorreta=2727"
 
 :autenticacao
@@ -50,18 +53,18 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: O comando abaixo usa o CURL para baixar direto e mostra o progresso em %
-curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+:: O comando abaixo usa o parâmetro -UseBasicParsing para evitar o erro da sua imagem
+powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
 
 if not exist "JOGOS_GameON.zip" (
     echo.
-    echo [ERRO] O arquivo nao foi baixado. Verifique sua internet.
+    echo [ERRO] Falha no download. Verifique sua conexao.
     pause
     goto :menu
 )
 
 echo.
-echo [!] Instalando e extraindo arquivos... Aguarde.
+echo [!] Instalando e extraindo arquivos...
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 
@@ -74,10 +77,11 @@ goto :menu
 cls
 cd /d "C:\GameON"
 echo [!] Atualizando...
-curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
-echo [+] Atualizado!
+echo.
+echo [+] Atualizado com sucesso!
 pause
 goto :menu
 
@@ -88,7 +92,8 @@ set /p confirma="(S/N): "
 if /i "%confirma%"=="S" (
     cd /d C:\
     rd /s /q "C:\GameON"
-    echo [-] Removido.
+    echo.
+    echo [-] Pasta removida.
 )
 pause
 goto :menu
