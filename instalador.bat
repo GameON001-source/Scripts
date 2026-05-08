@@ -47,22 +47,21 @@ echo [!] Preparando ambiente...
 if not exist "C:\GameON" mkdir "C:\GameON"
 cd /d "C:\GameON"
 
-echo [!] Baixando arquivos... Aguarde (Isso pode demorar).
+echo [!] Baixando arquivos... Aguarde.
+echo [!] Isso pode levar alguns minutos (1.5GB).
 echo.
-:: Usando CURL com -L para seguir o redirecionamento do Google
-curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
 
-if %errorlevel% neq 0 (
-    echo.
-    echo [ERRO] Falha no download.
-    pause
-    goto :menu
-)
+:: Este comando confirma o download de arquivos grandes no Google Drive
+curl -Lb cookie.txt "https://docs.google.com/uc?export=download&confirm=$(curl -sL -b cookie.txt 'https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' | grep -o 'confirm=[^&]*' | sed 's/confirm=//')&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
+
+:: Se o comando acima for muito complexo para o seu CMD, usamos esta alternativa mais simples:
+if not exist "JOGOS_GameON.zip" curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
 
 echo.
 echo [!] Instalando e extraindo arquivos...
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
+del /f /q "cookie.txt"
 
 echo.
 echo [+] INSTALACAO CONCLUIDA!
@@ -73,7 +72,7 @@ goto :menu
 cls
 cd /d "C:\GameON"
 echo [!] Atualizando...
-curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
+curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 echo [+] Atualizado!
