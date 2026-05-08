@@ -1,77 +1,36 @@
-@echo off
-title GameOn Digital - Central de Jogos
-color 0A
-set "senhaCorreta=2727"
+# Central GameOn Digital
+$senhaCorreta = "2727"
 
-:autenticacao
-cls
-echo ============================================
-echo           GAMEON DIGITAL - ACESSO
-echo ============================================
-echo.
-set /p "tentativa=Digite sua Chave de Acesso: "
-if "%tentativa%"=="%senhaCorreta%" (goto :menu) else (echo. & echo [ERRO] Chave incorreta! & pause & exit)
+Clear-Host
+Write-Host "============================================" -ForegroundColor Cyan
+Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
+Write-Host "============================================" -ForegroundColor Cyan
+Write-Host ""
+$tentativa = Read-Host "Digite sua Chave de Acesso"
 
-:menu
-cls
-echo ============================================
-echo           GAMEON DIGITAL - MENU
-echo ============================================
-echo.
-echo  [1] INSTALAR BIBLIOTECA
-echo  [2] ATUALIZAR ARQUIVOS
-echo  [3] DESINSTALAR TUDO
-echo  [4] SAIR
-echo.
-echo ============================================
-set /p opcao="Escolha uma opcao: "
-if "%opcao%"=="1" goto :instalar
-if "%opcao%"=="2" goto :atualizar
-if "%opcao%"=="3" goto :desinstalar
-if "%opcao%"=="4" exit
-goto :menu
-
-:instalar
-cls
-echo [!] Preparando ambiente...
-if not exist "C:\GameON" mkdir "C:\GameON"
-cd /d "C:\GameON"
-echo [!] Baixando arquivos... Aguarde.
-echo.
-
-:: DOWNLOAD DIRETO DO MEDIAFIRE
-curl -L "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip" -o "JOGOS_GameON.zip"
-
-if not exist "JOGOS_GameON.zip" (
-    echo.
-    echo [ERRO] Falha no download. O link pode ter expirado.
+if ($tentativa -ne $senhaCorreta) {
+    Write-Host "[ERRO] Chave incorreta!" -ForegroundColor Red
     pause
-    goto :menu
-)
+    exit
+}
 
-echo.
-echo [!] Instalando e extraindo arquivos...
-tar -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
-echo.
-echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
-pause
-goto :menu
+Clear-Host
+Write-Host " [1] INSTALAR BIBLIOTECA"
+Write-Host " [2] SAIR"
+$opcao = Read-Host "Escolha uma opcao"
 
-:atualizar
-cls
-cd /d "C:\GameON"
-echo [!] Atualizando...
-curl -L "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip" -o "JOGOS_GameON.zip"
-tar -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
-echo [+] Atualizado!
-pause
-goto :menu
-
-:desinstalar
-cls
-rd /s /q "C:\GameON" 2>nul
-echo [-] Pasta removida.
-pause
-goto :menu
+if ($opcao -eq "1") {
+    if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory }
+    Set-Location "C:\GameON"
+    Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Cyan
+    
+    # Link do MediaFire que você enviou
+    $url = "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip"
+    
+    Invoke-WebRequest -Uri $url -OutFile "C:\GameON\JOGOS.zip"
+    Write-Host "[!] Extraindo..." -ForegroundColor Yellow
+    Expand-Archive -Path "C:\GameON\JOGOS.zip" -DestinationPath "C:\GameON" -Force
+    Remove-Item "C:\GameON\JOGOS.zip"
+    Write-Host "[+] CONCLUIDO!" -ForegroundColor Green
+    pause
+}
