@@ -1,80 +1,77 @@
-# ============================================
-# GAMEON DIGITAL - SISTEMA EXECUTÁVEL V1.0
-# ============================================
+@echo off
+title GameOn Digital - Central de Jogos
+color 0A
+set "senhaCorreta=2727"
 
-$senhaCorreta = "2727"
+:autenticacao
+cls
+echo ============================================
+echo           GAMEON DIGITAL - ACESSO
+echo ============================================
+echo.
+set /p "tentativa=Digite sua Chave de Acesso: "
+if "%tentativa%"=="%senhaCorreta%" (goto :menu) else (echo. & echo [ERRO] Chave incorreta! & pause & exit)
 
-# Interface de Acesso
-Clear-Host
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host ""
-$tentativa = Read-Host " Digite sua Chave de Acesso"
+:menu
+cls
+echo ============================================
+echo           GAMEON DIGITAL - MENU
+echo ============================================
+echo.
+echo  [1] INSTALAR BIBLIOTECA
+echo  [2] ATUALIZAR ARQUIVOS
+echo  [3] DESINSTALAR TUDO
+echo  [4] SAIR
+echo.
+echo ============================================
+set /p opcao="Escolha uma opcao: "
+if "%opcao%"=="1" goto :instalar
+if "%opcao%"=="2" goto :atualizar
+if "%opcao%"=="3" goto :desinstalar
+if "%opcao%"=="4" exit
+goto :menu
 
-if ($tentativa -eq $senhaCorreta) {
-    
-    # Menu Principal
-    function Mostrar-Menu {
-        Clear-Host
-        Write-Host "============================================" -ForegroundColor Cyan
-        Write-Host "       GAMEON DIGITAL - MENU V1.0" -ForegroundColor Cyan
-        Write-Host "============================================" -ForegroundColor Cyan
-        Write-Host ""
-        Write-Host " [1] INSTALAR BIBLIOTECA COMPLETA" -ForegroundColor White
-        Write-Host " [2] ATUALIZAR JOGOS" -ForegroundColor White
-        Write-Host " [3] REMOVER SISTEMA" -ForegroundColor White
-        Write-Host " [4] SAIR" -ForegroundColor White
-        Write-Host ""
-        Write-Host "============================================" -ForegroundColor Cyan
-    }
+:instalar
+cls
+echo [!] Preparando ambiente...
+if not exist "C:\GameON" mkdir "C:\GameON"
+cd /d "C:\GameON"
+echo [!] Baixando arquivos... Aguarde.
+echo.
 
-    do {
-        Mostrar-Menu
-        $opcao = Read-Host " Escolha uma opcao"
+:: DOWNLOAD DIRETO DO MEDIAFIRE
+curl -L "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip" -o "JOGOS_GameON.zip"
 
-        switch ($opcao) {
-            "1" {
-                Clear-Host
-                Write-Host "[!] Criando pasta do sistema em C:\GameON..." -ForegroundColor Yellow
-                if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory | Out-Null }
-                
-                Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Cyan
-                $url = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
-                
-                # Download com barra de progresso oficial
-                Start-BitsTransfer -Source $url -Destination "C:\GameON\JOGOS_GameON.zip" -DisplayName "Baixando Biblioteca GameOn"
-
-                Write-Host "[!] Extraindo e configurando jogos..." -ForegroundColor Yellow
-                Expand-Archive -Path "C:\GameON\JOGOS_GameON.zip" -DestinationPath "C:\GameON" -Force
-                Remove-Item "C:\GameON\JOGOS_GameON.zip" -Force
-                
-                Write-Host "`n[+] INSTALACAO FINALIZADA COM SUCESSO!" -ForegroundColor Green
-                Write-Host "[+] Seus jogos estao prontos em C:\GameON" -ForegroundColor Green
-                pause
-            }
-            "2" {
-                Write-Host "[!] Verificando novas versoes..." -ForegroundColor Cyan
-                Start-BitsTransfer -Source "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -Destination "C:\GameON\JOGOS_GameON.zip"
-                Expand-Archive -Path "C:\GameON\JOGOS_GameON.zip" -DestinationPath "C:\GameON" -Force
-                Remove-Item "C:\GameON\JOGOS_GameON.zip" -Force
-                Write-Host "[+] Tudo atualizado!" -ForegroundColor Green
-                pause
-            }
-            "3" {
-                $confirm = Read-Host " Deseja remover todos os arquivos da GameON? (S/N)"
-                if ($confirm -eq "S" -or $confirm -eq "s") {
-                    Remove-Item "C:\GameON" -Recurse -Force
-                    Write-Host "[-] Sistema removido." -ForegroundColor Yellow
-                }
-                pause
-            }
-            "4" { exit }
-        }
-    } while ($opcao -ne "4")
-
-} else {
-    Write-Host "`n[ERRO] Chave incorreta! Acesso negado." -ForegroundColor Red
-    Write-Host " Adquira sua chave em: gameondigital.carrd.co"
+if not exist "JOGOS_GameON.zip" (
+    echo.
+    echo [ERRO] Falha no download. O link pode ter expirado.
     pause
-}
+    goto :menu
+)
+
+echo.
+echo [!] Instalando e extraindo arquivos...
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+echo.
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
+pause
+goto :menu
+
+:atualizar
+cls
+cd /d "C:\GameON"
+echo [!] Atualizando...
+curl -L "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip" -o "JOGOS_GameON.zip"
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+echo [+] Atualizado!
+pause
+goto :menu
+
+:desinstalar
+cls
+rd /s /q "C:\GameON" 2>nul
+echo [-] Pasta removida.
+pause
+goto :menu
