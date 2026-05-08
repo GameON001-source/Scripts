@@ -2,9 +2,7 @@
 title GameOn Digital - Central de Jogos
 color 0A
 
-:: ============================================
-:: CONFIGURAÇÃO DA SENHA
-:: ============================================
+:: SENHA
 set "senhaCorreta=2727"
 
 :autenticacao
@@ -32,16 +30,14 @@ echo ============================================
 echo.
 echo  [1] INSTALAR BIBLIOTECA
 echo  [2] ATUALIZAR ARQUIVOS
-echo  [3] DESINSTALAR TUDO
-echo  [4] SAIR
+echo  [3] SAIR
 echo.
 echo ============================================
 set /p opcao="Escolha uma opcao: "
 
 if "%opcao%"=="1" goto :instalar
-if "%opcao%"=="2" goto :atualizar
-if "%opcao%"=="3" goto :desinstalar
-if "%opcao%"=="4" exit
+if "%opcao%"=="2" goto :instalar
+if "%opcao%"=="3" exit
 goto :menu
 
 :instalar
@@ -53,48 +49,22 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: USANDO CURL DIRETAMENTE (ISSO PULA O ERRO DE SEGURANÇA DA IMAGEM)
-curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
+:: COMANDO DE DOWNLOAD DIRETO (SEM POWERSHELL)
+bitsadmin /transfer GameOnDownload /download /priority FOREGROUND "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" "C:\GameON\JOGOS_GameON.zip"
 
-if not exist "JOGOS_GameON.zip" (
+if not exist "C:\GameON\JOGOS_GameON.zip" (
     echo.
-    echo [ERRO] Falha no download. Verifique sua conexao.
+    echo [ERRO] O download falhou. Tente novamente.
     pause
     goto :menu
 )
 
 echo.
-echo [!] Instalando e extraindo arquivos...
-:: O comando tar é nativo do Windows e abre o ZIP sem erro
-tar -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
+echo [!] Instalando...
+tar -xf "C:\GameON\JOGOS_GameON.zip" -C "C:\GameON"
+del /f /q "C:\GameON\JOGOS_GameON.zip"
 
 echo.
-echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
-pause
-goto :menu
-
-:atualizar
-cls
-cd /d "C:\GameON"
-echo [!] Atualizando...
-curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
-tar -xf "JOGOS_GameON.zip"
-del /f /q "JOGOS_GameON.zip"
-echo.
-echo [+] Atualizado com sucesso!
-pause
-goto :menu
-
-:desinstalar
-cls
-echo [!] Desinstalar tudo?
-set /p confirma="(S/N): "
-if /i "%confirma%"=="S" (
-    cd /d C:\
-    rd /s /q "C:\GameON"
-    echo.
-    echo [-] Pasta removida.
-)
+echo [+] INSTALACAO CONCLUIDA!
 pause
 goto :menu
