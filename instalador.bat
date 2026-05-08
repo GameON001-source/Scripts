@@ -53,8 +53,8 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: O comando abaixo usa o parâmetro -UseBasicParsing para evitar o erro da sua imagem
-powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
+:: O CURL ignora avisos de segurança e baixa direto
+curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
 
 if not exist "JOGOS_GameON.zip" (
     echo.
@@ -77,7 +77,7 @@ goto :menu
 cls
 cd /d "C:\GameON"
 echo [!] Atualizando...
-powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
+curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 echo.
