@@ -1,22 +1,10 @@
 # ============================================
-# GAMEON DIGITAL - SISTEMA DE INSTALACAO V1.0
+# GAMEON DIGITAL - SISTEMA EXECUTÁVEL V1.0
 # ============================================
+
 $senhaCorreta = "2727"
 
-function Mostrar-Menu {
-    Clear-Host
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host "       GAMEON DIGITAL - MENU V1.0" -ForegroundColor Cyan
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host " [1] INSTALAR BIBLIOTECA" -ForegroundColor White
-    Write-Host " [2] ATUALIZAR ARQUIVOS" -ForegroundColor White
-    Write-Host " [3] DESINSTALAR TUDO" -ForegroundColor White
-    Write-Host " [4] SAIR" -ForegroundColor White
-    Write-Host ""
-    Write-Host "============================================" -ForegroundColor Cyan
-}
-
+# Interface de Acesso
 Clear-Host
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
@@ -25,6 +13,22 @@ Write-Host ""
 $tentativa = Read-Host " Digite sua Chave de Acesso"
 
 if ($tentativa -eq $senhaCorreta) {
+    
+    # Menu Principal
+    function Mostrar-Menu {
+        Clear-Host
+        Write-Host "============================================" -ForegroundColor Cyan
+        Write-Host "       GAMEON DIGITAL - MENU V1.0" -ForegroundColor Cyan
+        Write-Host "============================================" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host " [1] INSTALAR BIBLIOTECA COMPLETA" -ForegroundColor White
+        Write-Host " [2] ATUALIZAR JOGOS" -ForegroundColor White
+        Write-Host " [3] REMOVER SISTEMA" -ForegroundColor White
+        Write-Host " [4] SAIR" -ForegroundColor White
+        Write-Host ""
+        Write-Host "============================================" -ForegroundColor Cyan
+    }
+
     do {
         Mostrar-Menu
         $opcao = Read-Host " Escolha uma opcao"
@@ -32,48 +36,45 @@ if ($tentativa -eq $senhaCorreta) {
         switch ($opcao) {
             "1" {
                 Clear-Host
-                Write-Host "[!] Preparando ambiente em C:\GameON..." -ForegroundColor Yellow
+                Write-Host "[!] Criando pasta do sistema em C:\GameON..." -ForegroundColor Yellow
                 if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory | Out-Null }
                 
                 Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Cyan
-                # Link com confirmacao para pular aviso de virus do Google Drive
                 $url = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
                 
-                # Inicia o download com barra de progresso nativa do Windows
-                try {
-                    Start-BitsTransfer -Source $url -Destination "C:\GameON\JOGOS_GameON.zip" -DisplayName "Baixando Biblioteca GameOn"
-                    
-                    Write-Host "`n[!] Instalando e extraindo jogos..." -ForegroundColor Yellow
-                    Expand-Archive -Path "C:\GameON\JOGOS_GameON.zip" -DestinationPath "C:\GameON" -Force
-                    Remove-Item "C:\GameON\JOGOS_GameON.zip" -Force
-                    
-                    Write-Host "`n[+] INSTALACAO CONCLUIDA COM SUCESSO!" -ForegroundColor Green
-                } catch {
-                    Write-Host "`n[ERRO] Falha no download. Verifique sua conexao." -ForegroundColor Red
-                }
+                # Download com barra de progresso oficial
+                Start-BitsTransfer -Source $url -Destination "C:\GameON\JOGOS_GameON.zip" -DisplayName "Baixando Biblioteca GameOn"
+
+                Write-Host "[!] Extraindo e configurando jogos..." -ForegroundColor Yellow
+                Expand-Archive -Path "C:\GameON\JOGOS_GameON.zip" -DestinationPath "C:\GameON" -Force
+                Remove-Item "C:\GameON\JOGOS_GameON.zip" -Force
+                
+                Write-Host "`n[+] INSTALACAO FINALIZADA COM SUCESSO!" -ForegroundColor Green
+                Write-Host "[+] Seus jogos estao prontos em C:\GameON" -ForegroundColor Green
                 pause
             }
             "2" {
-                Write-Host "[!] Verificando atualizacoes..." -ForegroundColor Cyan
-                $url = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
-                Start-BitsTransfer -Source $url -Destination "C:\GameON\JOGOS_GameON.zip"
+                Write-Host "[!] Verificando novas versoes..." -ForegroundColor Cyan
+                Start-BitsTransfer -Source "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -Destination "C:\GameON\JOGOS_GameON.zip"
                 Expand-Archive -Path "C:\GameON\JOGOS_GameON.zip" -DestinationPath "C:\GameON" -Force
                 Remove-Item "C:\GameON\JOGOS_GameON.zip" -Force
                 Write-Host "[+] Tudo atualizado!" -ForegroundColor Green
                 pause
             }
             "3" {
-                $confirm = Read-Host " Deseja apagar TUDO em C:\GameON? (S/N)"
+                $confirm = Read-Host " Deseja remover todos os arquivos da GameON? (S/N)"
                 if ($confirm -eq "S" -or $confirm -eq "s") {
                     Remove-Item "C:\GameON" -Recurse -Force
-                    Write-Host "[-] Removido com sucesso." -ForegroundColor Yellow
+                    Write-Host "[-] Sistema removido." -ForegroundColor Yellow
                 }
                 pause
             }
             "4" { exit }
         }
     } while ($opcao -ne "4")
+
 } else {
     Write-Host "`n[ERRO] Chave incorreta! Acesso negado." -ForegroundColor Red
+    Write-Host " Adquira sua chave em: gameondigital.carrd.co"
     pause
 }
