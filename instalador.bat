@@ -2,9 +2,6 @@
 title GameOn Digital - Central de Jogos
 color 0A
 
-:: ============================================
-:: CONFIGURAÇÃO DA SENHA
-:: ============================================
 set "senhaCorreta=2727"
 
 :autenticacao
@@ -49,11 +46,24 @@ cls
 echo [!] Preparando ambiente...
 if not exist "C:\GameON" mkdir "C:\GameON"
 cd /d "C:\GameON"
-echo [!] Baixando arquivos... Aguarde.
-powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
-echo [!] Instalando...
-powershell -Command "Expand-Archive -Path 'C:\GameON\JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
-del /f /q "C:\GameON\JOGOS_GameON.zip"
+
+echo [!] Baixando arquivos... Aguarde (Isso pode demorar).
+echo.
+:: Usando CURL com -L para seguir o redirecionamento do Google
+curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
+
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERRO] Falha no download.
+    pause
+    goto :menu
+)
+
+echo.
+echo [!] Instalando e extraindo arquivos...
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+
 echo.
 echo [+] INSTALACAO CONCLUIDA!
 pause
@@ -63,9 +73,9 @@ goto :menu
 cls
 cd /d "C:\GameON"
 echo [!] Atualizando...
-powershell -Command "Start-BitsTransfer -Source 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -Destination 'C:\GameON\JOGOS_GameON.zip'"
-powershell -Command "Expand-Archive -Path 'C:\GameON\JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
-del /f /q "C:\GameON\JOGOS_GameON.zip"
+curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
 echo [+] Atualizado!
 pause
 goto :menu
