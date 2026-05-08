@@ -2,9 +2,6 @@
 title GameOn Digital - Central de Jogos
 color 0A
 
-:: ============================================
-:: CONFIGURAÇÃO DA SENHA
-:: ============================================
 set "senhaCorreta=2727"
 
 :autenticacao
@@ -53,41 +50,40 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: O CMD CHAMA O POWERSHELL ESCONDIDO PARA PULAR O ERRO DO GOOGLE DRIVE
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$id='17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-'; $url='https://docs.google.com/uc?export=download&id='+$id; $res=Invoke-WebRequest -Uri $url -SessionVariable s -UserAgent 'Mozilla/5.0'; $token=($res.Links | Where-Object {$_.href -like '*confirm=*'}).href.Split('confirm=')[1].Split('&')[0]; if($token){$url=$url+'&confirm='+$token}; Start-BitsTransfer -Source $url -Destination 'JOGOS_GameON.zip'"
+:: ADICIONADO -UseBasicParsing PARA REMOVER O AVISO DE SEGURANÇA
+powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
 
 if not exist "JOGOS_GameON.zip" (
     echo.
-    echo [ERRO] O download falhou. Verifique sua conexao.
+    echo [ERRO] Falha no download. Verifique sua conexao.
     pause
     goto :menu
 )
 
-echo [!] Instalando jogos...
-:: EXTRAÇÃO VIA POWERSHELL (MAIS SEGURA CONTRA ARQUIVO CORROMPIDO)
-powershell -Command "Expand-Archive -Path 'JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
+echo.
+echo [!] Instalando e extraindo arquivos...
+tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 
 echo.
-echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
-echo [+] Pasta: C:\GameON
+echo [+] INSTALACAO CONCLUIDA!
 pause
 goto :menu
 
 :atualizar
 cls
 cd /d "C:\GameON"
-echo [!] Atualizando arquivos...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$id='17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-'; $url='https://docs.google.com/uc?export=download&id='+$id; $res=Invoke-WebRequest -Uri $url -SessionVariable s -UserAgent 'Mozilla/5.0'; $token=($res.Links | Where-Object {$_.href -like '*confirm=*'}).href.Split('confirm=')[1].Split('&')[0]; if($token){$url=$url+'&confirm='+$token}; Start-BitsTransfer -Source $url -Destination 'JOGOS_GameON.zip'"
-powershell -Command "Expand-Archive -Path 'JOGOS_GameON.zip' -DestinationPath 'C:\GameON' -Force"
+echo [!] Atualizando...
+powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
+tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
-echo [+] Tudo atualizado!
+echo [+] Atualizado!
 pause
 goto :menu
 
 :desinstalar
 cls
-echo [!] Apagando todos os jogos em C:\GameON...
+echo [!] Desinstalando...
 rd /s /q "C:\GameON" 2>nul
 echo [-] Pasta removida.
 pause
