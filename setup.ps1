@@ -47,29 +47,37 @@ function Executar-Instalacao {
     Write-Host "[!] Preparando ambiente em $destino..." -ForegroundColor Yellow
     if (-not (Test-Path $destino)) { New-Item -ItemType Directory -Path $destino | Out-Null }
 
-    # 2. DOWNLOAD
-    Write-Host "[!] Baixando pacotes do servidor central..." -ForegroundColor Cyan
+    # 2. DOWNLOAD (AGORA BLINDADO COM CURL)
+    Write-Host "[!] Baixando pacotes do servidor central... Aguarde." -ForegroundColor Cyan
     $urlDrive = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
     
-    try {
-        # Start-BitsTransfer mostra a barra de progresso nativa do Windows
-        Start-BitsTransfer -Source $urlDrive -Destination $zipFile -ErrorAction Stop
-    } catch {
-        Write-Host "`n[ERRO] Falha no download. Verifique a internet ou o link." -ForegroundColor Red
+    # O "&" avisa ao PowerShell para rodar um aplicativo externo (curl.exe)
+    & curl.exe -L $urlDrive -o $zipFile
+
+    # Verifica se baixou o jogo ou se baixou uma página de erro do Google (menor que 1MB)
+    if (Test-Path $zipFile) {
+        $tamanho = (Get-Item $zipFile).Length
+        if ($tamanho -lt 1000000) {
+            Write-Host "`n[ERRO] Falha de comunicação com o Google Drive. O arquivo está vazio." -ForegroundColor Red
+            Remove-Item $zipFile -Force
+            Pause; return
+        }
+    } else {
+        Write-Host "`n[ERRO] O arquivo não foi baixado." -ForegroundColor Red
         Pause; return
     }
 
-    # 3. EXTRAÇÃO
+    # 3. EXTRAÇÃO (AGORA BLINDADA COM TAR)
     Write-Host "`n[!] Extraindo arquivos para a biblioteca..." -ForegroundColor Cyan
     try {
-        Expand-Archive -Path $zipFile -DestinationPath $destino -Force -ErrorAction Stop
+        & tar.exe -xf $zipFile -C $destino
         
         # 4. LIMPEZA
         Remove-Item $zipFile -Force -ErrorAction SilentlyContinue
         Write-Host "`n[+] GAMEON DIGITAL INSTALADO COM SUCESSO!" -ForegroundColor Green
         Write-Host "[+] Local: $destino" -ForegroundColor Green
     } catch {
-        Write-Host "`n[ERRO] Falha na extração dos arquivos." -ForegroundColor Red
+        Write-Host "`n[ERRO] Falha ao extrair. Arquivo corrompido ou espaço insuficiente." -ForegroundColor Red
     }
     Pause
 }
