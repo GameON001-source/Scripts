@@ -1,63 +1,93 @@
-# Setup GameOn Digital - Versão Final Ultra-Estável
-$senhaCorreta = "2727"
-$caminhoFinal = "C:\GameON"
-$zipTemp = "$env:TEMP\jogos_gameon.zip"
+@echo off
+title GameOn Digital - Central de Jogos
+color 0A
 
-Clear-Host
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-$tentativa = Read-Host "Digite sua Chave de Acesso"
+:: ============================================
+:: CONFIGURAÇÃO DE ACESSO
+:: ============================================
+set "senhaCorreta=2727"
 
-if ($tentativa -ne $senhaCorreta) {
-    Write-Host "`n[ERRO] Senha incorreta! O programa sera fechado." -ForegroundColor Red
+:autenticacao
+cls
+echo ============================================
+echo           GAMEON DIGITAL - ACESSO
+echo ============================================
+echo.
+set /p "tentativa=Digite sua Chave de Acesso: "
+
+if "%tentativa%"=="%senhaCorreta%" (
+    goto :menu
+) else (
+    echo.
+    echo [ERRO] Chave incorreta!
+    echo Adquira sua licenca em: gameondigital.carrd.co
     pause
     exit
-}
+)
 
-# VERIFICAÇÃO DE ADMINISTRADOR (Necessário para instalar no C:)
-$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host "`n[!] ERRO: VOCE PRECISA EXECUTAR COMO ADMINISTRADOR." -ForegroundColor Red
-    Write-Host "[!] Feche, clique com o botao direito no PowerShell e escolha 'Executar como Administrador'." -ForegroundColor Yellow
+:menu
+cls
+echo ============================================
+echo           GAMEON DIGITAL - MENU
+echo ============================================
+echo.
+echo  [1] INSTALAR BIBLIOTECA DE JOGOS
+echo  [2] ATUALIZAR ARQUIVOS
+echo  [3] DESINSTALAR TUDO
+echo  [4] SAIR
+echo.
+echo ============================================
+set /p opcao="Escolha uma opcao: "
+
+if "%opcao%"=="1" goto :instalar
+if "%opcao%"=="2" goto :instalar
+if "%opcao%"=="3" goto :desinstalar
+if "%opcao%"=="4" exit
+goto :menu
+
+:instalar
+cls
+echo [!] Preparando ambiente em C:\GameON...
+if not exist "C:\GameON" mkdir "C:\GameON"
+cd /d "C:\GameON"
+
+echo [!] Baixando arquivos... Aguarde ate concluir (100%%).
+echo.
+
+:: DOWNLOAD DIRETO VIA MEDIAFIRE (LINK ATUALIZADO)
+curl -L "https://download1474.mediafire.com/8yr33b8af2iguqXHXEqQpoJp9QG8u93ewiXFtrXcsIwQ2YGndtEAlRDzKmB-KLNO2Mz87sIGLdgPwXioBovB0b4YrZ--I0DCjMWsBvA_7lYA3Gbkw5zeHcJF7ZJt2IaCZ9syMOEf6RMEv2LCHf9R76mF-vHcPfVH1Hd00RoH0JMsGA/baoqw8uen6qnh83/JOGOS+STEAM+GameON.zip" -o "JOGOS.zip"
+
+:: Validação: Se o arquivo tiver menos de 1MB, o link provavelmente expirou
+for %%A in ("JOGOS.zip") do if %%~zA LSS 1000000 (
+    echo.
+    echo [ERRO] O download falhou ou o link expirou.
+    echo Por favor, gere um novo link no MediaFire e atualize o script.
+    del "JOGOS.zip"
     pause
-    exit
-}
+    goto :menu
+)
 
-Clear-Host
-Write-Host "[!] Iniciando instalacao..." -ForegroundColor Yellow
+echo.
+echo [!] Extraindo jogos... Isso pode levar alguns minutos.
+tar -xf "JOGOS.zip"
+del /f /q "JOGOS.zip"
 
-# 1. Criar a pasta no C: (Forçado)
-if (!(Test-Path $caminhoFinal)) {
-    Write-Host "[+] Criando diretorio $caminhoFinal..." -ForegroundColor Gray
-    New-Item -Path $caminhoFinal -ItemType Directory -Force | Out-Null
-}
-
-# 2. Download Direto (Ignora aviso de vírus do Google Drive)
-Write-Host "[!] Baixando arquivos da biblioteca... Aguarde." -ForegroundColor Cyan
-$url = "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t"
-curl.exe -L $url -o $zipTemp
-
-# 3. Verificação e Extração
-if (Test-Path $zipTemp) {
-    $tamanho = (Get-Item $zipTemp).length
-    if ($tamanho -gt 1000) {
-        Write-Host "[!] Extraindo arquivos para $caminhoFinal..." -ForegroundColor Yellow
-        # Usa o TAR do Windows para extrair o ZIP
-        tar.exe -xf $zipTemp -C $caminhoFinal
-        
-        # Limpa o arquivo temporário
-        Remove-Item $zipTemp -Force
-        
-        Write-Host "`n============================================" -ForegroundColor Green
-        Write-Host "      INSTALACAO CONCLUIDA COM SUCESSO!" -ForegroundColor Green
-        Write-Host "   Os jogos estao prontos em: $caminhoFinal" -ForegroundColor Green
-        Write-Host "============================================" -ForegroundColor Green
-    } else {
-        Write-Host "[ERRO] O arquivo baixado parece estar vazio ou corrompido." -ForegroundColor Red
-    }
-} else {
-    Write-Host "[ERRO] Falha critica no download. Verifique sua internet." -ForegroundColor Red
-}
-
+echo.
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
+echo [+] Seus jogos estao prontos em C:\GameON
+echo.
 pause
+goto :menu
+
+:desinstalar
+cls
+echo [!] ATENCAO: Isso apagara todos os jogos da pasta C:\GameON.
+set /p confirma="Deseja continuar? (S/N): "
+if /i "%confirma%"=="S" (
+    cd /d C:\
+    rd /s /q "C:\GameON"
+    echo.
+    echo [-] Remocao concluida.
+)
+pause
+goto :menu
