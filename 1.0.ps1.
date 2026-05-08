@@ -1,65 +1,32 @@
-# GameOn Digital - Script de Instalação
-$senhaCorreta = "2727"
-
-Clear-Host
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host ""
-
-$tentativa = Read-Host "Digite sua Chave de Acesso"
-
-if ($tentativa -ne $senhaCorreta) {
-    Write-Host ""
-    Write-Host "[ERRO] Chave incorreta! Acesso negado." -ForegroundColor Red
-    Start-Sleep -Seconds 3
-    exit
-}
-
-function Show-Menu {
-    Clear-Host
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host "          GAMEON DIGITAL - MENU" -ForegroundColor Cyan
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host " [1] INSTALAR BIBLIOTECA"
-    Write-Host " [2] ATUALIZAR ARQUIVOS"
-    Write-Host " [3] DESINSTALAR TUDO"
-    Write-Host " [4] SAIR"
-    Write-Host ""
-}
-
-Show-Menu
-$opcao = Read-Host "Escolha uma opcao"
-
-switch ($opcao) {
-    "1" {
-        if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory }
-        Set-Location "C:\GameON"
-        Write-Host "[!] Baixando arquivos... Aguarde." -ForegroundColor Yellow
-        
-        # Download direto do Google Drive
-        curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
-        
-        Write-Host "[!] Extraindo arquivos..." -ForegroundColor Cyan
-        tar.exe -xf "JOGOS_GameON.zip"
-        Remove-Item "JOGOS_GameON.zip" -Force
-        Write-Host "[+] INSTALACAO CONCLUIDA!" -ForegroundColor Green
-        pause
-    }
-    "2" {
-        Set-Location "C:\GameON"
-        Write-Host "[!] Atualizando..." -ForegroundColor Yellow
-        curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
-        tar.exe -xf "JOGOS_GameON.zip"
-        Remove-Item "JOGOS_GameON.zip" -Force
-        Write-Host "[+] Atualizado!" -ForegroundColor Green
-        pause
-    }
-    "3" {
-        Remove-Item "C:\GameON" -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "[-] Pasta GameON removida." -ForegroundColor Yellow
-        pause
-    }
-    "4" { exit }
-}
+@echo off
+title GameOn Digital - Central de Jogos
+color 0A
+set "senhaCorreta=2727"
+:autenticacao
+cls
+echo ============================================
+echo           GAMEON DIGITAL - ACESSO
+echo ============================================
+echo.
+set /p "tentativa=Digite sua Chave de Acesso: "
+if "%tentativa%"=="%senhaCorreta%" ( goto :menu ) else ( echo. && echo [ERRO] Chave incorreta! && pause && exit )
+:menu
+cls
+echo [1] INSTALAR BIBLIOTECA
+echo [2] SAIR
+set /p opcao="Escolha: "
+if "%opcao%"=="1" goto :instalar
+if "%opcao%"=="2" exit
+:instalar
+cls
+echo [!] Preparando ambiente...
+if not exist "C:\GameON" mkdir "C:\GameON"
+cd /d "C:\GameON"
+echo [!] Baixando arquivos... Aguarde.
+curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+echo [!] Instalando...
+tar -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+echo [+] CONCLUIDO!
+pause
+goto :menu
