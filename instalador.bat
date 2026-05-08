@@ -50,23 +50,23 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: ADICIONADO -UseBasicParsing PARA REMOVER O AVISO DE SEGURANÇA
-powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
+:: O comando abaixo usa o CURL para baixar direto e mostra o progresso em %
+curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
 
 if not exist "JOGOS_GameON.zip" (
     echo.
-    echo [ERRO] Falha no download. Verifique sua conexao.
+    echo [ERRO] O arquivo nao foi baixado. Verifique sua internet.
     pause
     goto :menu
 )
 
 echo.
-echo [!] Instalando e extraindo arquivos...
+echo [!] Instalando e extraindo arquivos... Aguarde.
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 
 echo.
-echo [+] INSTALACAO CONCLUIDA!
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
 pause
 goto :menu
 
@@ -74,7 +74,7 @@ goto :menu
 cls
 cd /d "C:\GameON"
 echo [!] Atualizando...
-powershell -Command "Invoke-WebRequest -Uri 'https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-' -OutFile 'JOGOS_GameON.zip' -UseBasicParsing"
+curl -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 echo [+] Atualizado!
@@ -83,8 +83,12 @@ goto :menu
 
 :desinstalar
 cls
-echo [!] Desinstalando...
-rd /s /q "C:\GameON" 2>nul
-echo [-] Pasta removida.
+echo [!] Desinstalar tudo?
+set /p confirma="(S/N): "
+if /i "%confirma%"=="S" (
+    cd /d C:\
+    rd /s /q "C:\GameON"
+    echo [-] Removido.
+)
 pause
 goto :menu
