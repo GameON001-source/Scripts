@@ -53,7 +53,7 @@ cd /d "C:\GameON"
 echo [!] Baixando arquivos... Aguarde.
 echo.
 
-:: O CURL ignora avisos de segurança e baixa direto
+:: USANDO CURL DIRETAMENTE (ISSO PULA O ERRO DE SEGURANÇA DA IMAGEM)
 curl -L "https://drive.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-" -o "JOGOS_GameON.zip"
 
 if not exist "JOGOS_GameON.zip" (
@@ -65,6 +65,7 @@ if not exist "JOGOS_GameON.zip" (
 
 echo.
 echo [!] Instalando e extraindo arquivos...
+:: O comando tar é nativo do Windows e abre o ZIP sem erro
 tar -xf "JOGOS_GameON.zip"
 del /f /q "JOGOS_GameON.zip"
 
