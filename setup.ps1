@@ -1,54 +1,98 @@
-# Central GameOn Digital - Versão PowerShell
-$senhaCorreta = "2727"
+@echo off
+title GameOn Digital - Central de Jogos
+color 0A
 
-Clear-Host
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "          GAMEON DIGITAL - ACESSO" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host ""
+:: SENHA DE ACESSO
+set "senhaCorreta=2727"
 
-$tentativa = Read-Host "Digite sua Chave de Acesso"
+:autenticacao
+cls
+echo ============================================
+echo           GAMEON DIGITAL - ACESSO
+echo ============================================
+echo.
+set /p "tentativa=Digite sua Chave de Acesso: "
 
-if ($tentativa -ne $senhaCorreta) {
-    Write-Host ""
-    Write-Host "[ERRO] Chave incorreta! Acesso negado." -ForegroundColor Red
+if "%tentativa%"=="%senhaCorreta%" (
+    goto :menu
+) else (
+    echo.
+    echo [ERRO] Chave incorreta!
     pause
     exit
-}
+)
 
-function Show-Menu {
-    Clear-Host
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host "          GAMEON DIGITAL - MENU" -ForegroundColor Cyan
-    Write-Host "============================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host " [1] INSTALAR BIBLIOTECA DE JOGOS"
-    Write-Host " [2] SAIR"
-    Write-Host ""
-    Write-Host "============================================" -ForegroundColor Cyan
-}
+:menu
+cls
+echo ============================================
+echo           GAMEON DIGITAL - MENU
+echo ============================================
+echo.
+echo  [1] INSTALAR BIBLIOTECA
+echo  [2] ATUALIZAR ARQUIVOS
+echo  [3] DESINSTALAR TUDO
+echo  [4] SAIR
+echo.
+echo ============================================
+set /p opcao="Escolha uma opcao: "
 
-Show-Menu
-$opcao = Read-Host "Escolha uma opcao"
+if "%opcao%"=="1" goto :instalar
+if "%opcao%"=="2" goto :atualizar
+if "%opcao%"=="3" goto :desinstalar
+if "%opcao%"=="4" exit
+goto :menu
 
-if ($opcao -eq "1") {
-    Clear-Host
-    Write-Host "[!] Preparando ambiente em C:\GameON..." -ForegroundColor Yellow
-    if (!(Test-Path "C:\GameON")) { New-Item -Path "C:\GameON" -ItemType Directory }
-    Set-Location "C:\GameON"
-    
-    Write-Host "[!] Baixando arquivos... Isso pode demorar (1.5GB)." -ForegroundColor Cyan
-    # Use o seu link do MediaFire ou Dropbox abaixo
-    curl -L "COLE_AQUI_O_SEU_LINK_DO_MEDIAFIRE_OU_DROPBOX" -o "JOGOS.zip"
-    
-    Write-Host "[!] Extraindo jogos..." -ForegroundColor Yellow
-    tar -xf "JOGOS.zip"
-    Remove-Item "JOGOS.zip" -Force
-    
-    Write-Host ""
-    Write-Host "[+] INSTALACAO CONCLUIDA COM SUCESSO!" -ForegroundColor Green
-    Write-Host "[+] Verifique a pasta C:\GameON" -ForegroundColor Green
+:instalar
+cls
+echo [!] Preparando ambiente em C:\GameON...
+if not exist "C:\GameON" mkdir "C:\GameON"
+cd /d "C:\GameON"
+
+echo [!] Baixando arquivos... Aguarde.
+echo.
+
+:: USANDO CURL.EXE PARA EVITAR CONFLITOS
+curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+
+if not exist "JOGOS_GameON.zip" (
+    echo.
+    echo [ERRO] Falha no download. Verifique sua conexao.
     pause
-} else {
-    exit
-}
+    goto :menu
+)
+
+echo.
+echo [!] Instalando e extraindo arquivos...
+tar.exe -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+
+echo.
+echo [+] INSTALACAO CONCLUIDA COM SUCESSO!
+echo [+] Verifique a pasta C:\GameON
+pause
+goto :menu
+
+:atualizar
+cls
+cd /d "C:\GameON"
+echo [!] Atualizando arquivos...
+curl.exe -L "https://docs.google.com/uc?export=download&id=17_OBFcod8dKv6rXhg8_T2gfkohYZ8hx-&confirm=t" -o "JOGOS_GameON.zip"
+tar.exe -xf "JOGOS_GameON.zip"
+del /f /q "JOGOS_GameON.zip"
+echo.
+echo [+] Atualizado com sucesso!
+pause
+goto :menu
+
+:desinstalar
+cls
+echo [!] Desinstalar tudo? (Isso apagara a pasta C:\GameON)
+set /p confirma="(S/N): "
+if /i "%confirma%"=="S" (
+    cd /d C:\
+    rd /s /q "C:\GameON"
+    echo.
+    echo [-] Removido com sucesso.
+)
+pause
+goto :menu
